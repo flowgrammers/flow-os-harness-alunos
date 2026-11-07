@@ -1,0 +1,23 @@
+{
+  "name": "flowgrammers-alunos",
+  "owner": {
+    "name": "Flowgrammers"
+  },
+  "metadata": {
+    "description": "Flow OS · Bazuca, a versão gratuita do harness da Flowgrammers para Claude Code: um modo de trabalho simples para projetos de pequeno e médio porte, com plano, teste primeiro, revisão de código, requisitos verificados, validação e entrega ao cliente em HTML e guardas contra segredo, comando perigoso e texto sem acento.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "flow-os-bazuca",
+      "description": "Flow OS · Bazuca, a versão gratuita do harness da Flowgrammers para Claude Code: um modo de trabalho simples para projetos de pequeno e médio porte, com plano, teste primeiro, revisão de código, requisitos verificados, validação e entrega ao cliente em HTML e guardas contra segredo, comando perigoso e texto sem acento.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Flowgrammers"
+      },
+      "source": "./plugins/flow-os-bazuca",
+      "category": "workflow",
+      "strict": false
+    }
+  ]
+}

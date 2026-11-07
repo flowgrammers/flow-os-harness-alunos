@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE DE REFERÊNCIA — Documento de Validação de Requisitos (client-validation skill)
+
+  COMO USAR (agente):
+  1. Copie este arquivo e substitua todos os {{PLACEHOLDERS}} e os cards de exemplo.
+  2. MARCA: preencha o bloco :root "ZONA DE MARCA" com a identidade do PROJETO
+     (cliente externo = brief/identidade do cliente; NUNCA a marca da casa por padrão —
+     ver Roteamento de Marca no CLAUDE.md global).
+  3. Seções sem itens são REMOVIDAS por inteiro (inclusive do statusbar se for o caso).
+  4. Cards de COMUNICADOS e EM ESTUDO não têm botões — não adicione.
+  5. A constante REF do script DEVE bater com o nome do arquivo (VALID-{YYYY-MM-DD}-{slug}).
+  6. Todo o texto visível em pt-BR com acentuação correta.
+  7. Salvar como: {projeto}/docs/requisitos/validacao/VALIDACAO-{YYYY-MM-DD}.html
+-->
+<html lang="pt-BR"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{PROJETO}} — Validação de Requisitos | {{DATA_LEGIVEL}}</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    /* ================= ZONA DE MARCA (preencher pelo brief do projeto) ================= */
+    --bg: #0a1628;            /* fundo da página */
+    --bg-2: #0d1b30;          /* fundo alternativo */
+    --card: rgba(255,255,255,0.045);
+    --card-hover: rgba(255,255,255,0.07);
+    --line: rgba(255,255,255,0.09);
+    --accent: #E8E44D;        /* cor de destaque da marca do projeto */
+    --accent-contrast: #0a1628; /* texto sobre o accent */
+    --accent-soft: rgba(232,228,77,0.13);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.62);
+    --dim: rgba(255,255,255,0.38);
+    --surface-2: rgba(0,0,0,0.22);
+    --surface-3: rgba(0,0,0,0.3);
+    --surface-code: rgba(0,0,0,0.4);
+    --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+    /* =================================================================================== */
+
+    /* Semânticas de decisão (raramente mudam) */
+    --green: #4ade80;  --green-bg: rgba(74,222,128,0.13);
+    --amber: #fbbf24;  --amber-bg: rgba(251,191,36,0.13);
+    --blue:  #60a5fa;  --blue-bg:  rgba(96,165,250,0.13);
+    --red:   #f87171;  --red-bg:   rgba(248,113,113,0.13);
+    --r: 14px; --r-sm: 9px;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-ui); background: var(--bg); color: var(--text);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---------- barra fixa de progresso ---------- */
+  .statusbar { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 93%, transparent);
+    backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  .statusbar-inner { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center;
+    justify-content: space-between; padding: 11px 16px; max-width: 1080px; margin: 0 auto; }
+  .sb-brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 0.82rem; }
+  .sb-counts { display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.72rem; font-weight: 600; }
+  .sb-pill { padding: 3px 9px; border-radius: 100px; border: 1px solid var(--line); color: var(--muted); }
+  .sb-pill strong { color: var(--text); }
+  .sb-pill.ok  { background: var(--green-bg); border-color: rgba(74,222,128,0.3); color: var(--green); }
+  .sb-pill.adj { background: var(--amber-bg); border-color: rgba(251,191,36,0.3); color: var(--amber); }
+  .sb-pill.no  { background: var(--red-bg); border-color: rgba(248,113,113,0.3); color: var(--red); }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 44px 0 34px; border-bottom: 1px solid var(--line); }
+  .kicker { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px; }
+  h1 { font-size: clamp(1.65rem, 5.5vw, 2.7rem); font-weight: 800; line-height: 1.15;
+    letter-spacing: -0.02em; margin-bottom: 16px; }
+  .lead { font-size: clamp(0.95rem, 2.6vw, 1.08rem); color: var(--muted); max-width: 62ch; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .tag { font-size: 0.73rem; font-weight: 600; padding: 5px 11px; border-radius: 100px;
+    border: 1px solid var(--line); color: var(--muted); }
+  .tag.hot { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .howto { margin: 26px 0 0; background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--r); padding: 18px; }
+  .howto h3 { font-size: 0.83rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); margin-bottom: 10px; }
+  .howto p { font-size: 0.9rem; color: var(--muted); }
+  .howto p + p { margin-top: 8px; }
+  .howto strong { color: var(--text); }
+
+  /* ---------- seções ---------- */
+  section { padding: 44px 0; border-bottom: 1px solid var(--line); }
+  .sec-head { margin-bottom: 26px; }
+  .sec-num { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 7px; }
+  h2 { font-size: clamp(1.25rem, 4vw, 1.75rem); font-weight: 800; letter-spacing: -0.015em;
+    line-height: 1.2; margin-bottom: 10px; }
+  .sec-sub { font-size: 0.94rem; color: var(--muted); max-width: 66ch; }
+  .sec-sub strong { color: var(--text); }
+
+  /* ---------- panorama ---------- */
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 17px 18px; }
+  .stat-n { font-size: 2rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+  .stat-n.g { color: var(--green); } .stat-n.a { color: var(--amber); }
+  .stat-n.b { color: var(--blue); }  .stat-n.acc { color: var(--accent); }
+  .stat-l { font-size: 0.8rem; color: var(--muted); margin-top: 7px; }
+
+  /* ---------- bloqueios ---------- */
+  .ask { background: linear-gradient(180deg, var(--accent-soft), transparent);
+    border: 1px solid var(--accent); border-radius: var(--r); padding: 20px 18px; }
+  .ask h3 { font-size: 1.02rem; font-weight: 700; margin-bottom: 6px; }
+  .ask > p { font-size: 0.9rem; color: var(--muted); margin-bottom: 16px; }
+  .ask-list { display: grid; gap: 10px; }
+  .ask-item { display: grid; grid-template-columns: 26px 1fr; gap: 12px; background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: var(--r-sm); padding: 13px 14px; }
+  .ask-n { width: 26px; height: 26px; border-radius: 7px; background: var(--accent);
+    color: var(--accent-contrast); display: grid; place-items: center; font-size: 0.78rem; font-weight: 800; }
+  .ask-item h4 { font-size: 0.91rem; font-weight: 700; margin-bottom: 3px; }
+  .ask-item p { font-size: 0.84rem; color: var(--muted); }
+  .ask-item .who { font-size: 0.76rem; color: var(--accent); font-weight: 600; margin-top: 6px; }
+
+  /* ---------- cards de item ---------- */
+  /* minmax(0,1fr): sem isso, a coluna do grid dimensiona por min-content do card
+     e estoura o viewport em 320px (overflow horizontal) */
+  .items { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .item { background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 17px 16px; transition: border-color .18s ease, background .18s ease; }
+  .item:hover { background: var(--card-hover); }
+  .item[data-state="ok"]  { border-color: rgba(74,222,128,0.45); }
+  .item[data-state="adj"] { border-color: rgba(251,191,36,0.45); }
+  .item[data-state="no"]  { border-color: rgba(248,113,113,0.45); opacity: 0.72; }
+  .item-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-bottom: 9px; }
+  .item-id { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.05em; color: var(--accent-contrast);
+    background: var(--accent); padding: 3px 8px; border-radius: 5px; }
+  .item-id.mute { background: rgba(255,255,255,0.16); color: var(--text); }
+  .item-title { font-size: 1rem; font-weight: 700; line-height: 1.35; flex: 1 1 220px; }
+  .item-body { font-size: 0.88rem; color: var(--muted); }
+  .item-body strong { color: var(--text); font-weight: 600; }
+  .quote { margin-top: 11px; padding: 10px 13px; background: var(--surface-2);
+    border-left: 2px solid var(--accent); border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    font-size: 0.83rem; color: var(--muted); font-style: italic; }
+  .quote span { display: block; font-style: normal; font-size: 0.74rem; color: var(--dim); margin-top: 5px; }
+  .inference { margin-top: 11px; padding: 10px 13px; background: var(--surface-2);
+    border-left: 2px dashed var(--dim); border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    font-size: 0.83rem; color: var(--muted); }
+  .inference span { display: block; font-size: 0.74rem; color: var(--dim); margin-top: 5px; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .chip { font-size: 0.71rem; font-weight: 600; padding: 3px 9px; border-radius: 100px;
+    border: 1px solid var(--line); color: var(--muted); }
+  .chip.warn { background: var(--amber-bg); border-color: rgba(251,191,36,0.32); color: var(--amber); }
+  .chip.info { background: var(--blue-bg); border-color: rgba(96,165,250,0.32); color: var(--blue); }
+  .chip.good { background: var(--green-bg); border-color: rgba(74,222,128,0.32); color: var(--green); }
+  .chip.bug  { background: var(--red-bg); border-color: rgba(248,113,113,0.32); color: var(--red); }
+
+  /* ---------- checklist de pacote ---------- */
+  .pkg-list { margin: 11px 0 0; padding: 12px 14px; background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: var(--r-sm); }
+  .pkg-list li { list-style: none; font-size: 0.84rem; color: var(--muted); padding: 4px 0;
+    display: flex; gap: 8px; align-items: baseline; }
+  .pkg-list li::before { content: "▸"; color: var(--accent); font-size: 0.7rem; }
+  .pkg-list li code { font-size: 0.72rem; color: var(--dim); }
+
+  /* ---------- botões de decisão ---------- */
+  .decide { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; padding-top: 13px;
+    border-top: 1px solid var(--line); }
+  .btn { font-family: inherit; font-size: 0.78rem; font-weight: 700; padding: 11px 16px;
+    min-height: 44px; border-radius: 100px; border: 1px solid var(--line); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all .16s ease; }
+  .btn:hover { border-color: rgba(255,255,255,0.28); color: var(--text); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn[aria-pressed="true"][data-v="ok"]  { background: var(--green); border-color: var(--green); color: #06280f; }
+  .btn[aria-pressed="true"][data-v="adj"] { background: var(--amber); border-color: var(--amber); color: #2b1d00; }
+  .btn[aria-pressed="true"][data-v="no"]  { background: var(--red); border-color: var(--red); color: #2e0707; }
+  .note { width: 100%; margin-top: 9px; font-family: inherit; font-size: 0.84rem;
+    background: var(--surface-3); color: var(--text); border: 1px solid var(--line);
+    border-radius: var(--r-sm); padding: 9px 11px; resize: vertical; min-height: 42px; display: none; }
+  .note::placeholder { color: var(--dim); }
+  .note:focus { outline: none; border-color: var(--accent); }
+  .item[data-state="adj"] .note, .item[data-state="no"] .note { display: block; }
+
+  /* ---------- tabela (Em estudo) ---------- */
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--line); border-radius: var(--r); }
+  table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  th, td { padding: 11px 13px; text-align: left; font-size: 0.84rem; border-bottom: 1px solid var(--line); }
+  th { background: rgba(255,255,255,0.045); font-weight: 700; font-size: 0.76rem;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  td { color: var(--muted); }
+  td strong { color: var(--text); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ---------- sequência ---------- */
+  .steps { display: grid; gap: 11px; }
+  .step { display: grid; grid-template-columns: 30px 1fr; gap: 13px; background: var(--card);
+    border: 1px solid var(--line); border-radius: var(--r); padding: 15px 16px; }
+  .step-n { width: 30px; height: 30px; border-radius: 9px; background: rgba(255,255,255,0.09);
+    color: var(--text); display: grid; place-items: center; font-size: 0.82rem; font-weight: 800; }
+  .step:first-child .step-n { background: var(--accent); color: var(--accent-contrast); }
+  .step h4 { font-size: 0.94rem; font-weight: 700; margin-bottom: 4px; }
+  .step p { font-size: 0.85rem; color: var(--muted); }
+  .step .when { font-size: 0.75rem; color: var(--accent); font-weight: 600; margin-top: 6px; }
+
+  /* ---------- fechamento ---------- */
+  .export { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--card);
+    border: 1px solid var(--line); border-radius: var(--r); padding: 18px; }
+  .btn-primary { font-family: inherit; font-size: 0.85rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.04em; padding: 13px 22px; min-height: 46px; background: var(--accent);
+    color: var(--accent-contrast); border: none; border-radius: 100px; cursor: pointer;
+    transition: transform .16s ease; }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-primary:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .btn-ghost { font-family: inherit; font-size: 0.8rem; font-weight: 600; padding: 12px 18px;
+    min-height: 46px; background: transparent; color: var(--muted); border: 1px solid var(--line);
+    border-radius: 100px; cursor: pointer; }
+  .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.28); }
+  .export-msg { font-size: 0.82rem; color: var(--green); font-weight: 600; }
+  #resumo { display: none; width: 100%; margin-top: 14px;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.78rem;
+    background: var(--surface-code); color: var(--text); border: 1px solid var(--line);
+    border-radius: var(--r-sm); padding: 14px; min-height: 220px; line-height: 1.55; }
+
+  footer { padding: 34px 0 46px; }
+  .foot-brand { font-weight: 800; font-size: 0.95rem; margin-bottom: 6px; }
+  .foot-txt { font-size: 0.8rem; color: var(--dim); }
+  .foot-txt + .foot-txt { margin-top: 4px; }
+
+  @media (min-width: 768px) {
+    .wrap { padding: 0 32px; }
+    .statusbar-inner { padding: 13px 32px; }
+    .hero { padding: 64px 0 46px; }
+    section { padding: 60px 0; }
+    .stats { grid-template-columns: repeat(4, 1fr); }
+    .ask, .howto { padding: 24px; }
+    .item { padding: 20px 22px; }
+    .ask-item { grid-template-columns: 30px 1fr; padding: 15px 17px; }
+  }
+  @media print {
+    .statusbar, .decide, .export { display: none !important; }
+    body { background: #fff; color: #111; }
+    .item, .stat, .ask, .step, .howto { border-color: #ccc; background: #fff; }
+    .item-body, .sec-sub, .lead, td { color: #333; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="statusbar">
+  <div class="statusbar-inner">
+    <div class="sb-brand">{{PROJETO}} · Validação de requisitos</div>
+    <div class="sb-counts">
+      <span class="sb-pill">Decididos <strong id="c-total">0</strong>/{{TOTAL_DECISOES}}</span>
+      <span class="sb-pill ok">OK <strong id="c-ok">0</strong></span>
+      <span class="sb-pill adj">Ajustar <strong id="c-adj">0</strong></span>
+      <span class="sb-pill no">Não <strong id="c-no">0</strong></span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="kicker">Documento de validação · {{DATA_LEGIVEL}}</div>
+    <h1>{{TITULO — ex.: Plano de execução pós-reunião de DD/MM}}</h1>
+    <p class="lead">
+      {{RESUMO: de onde vieram os itens (reuniões/áudios/auditoria com datas), e a promessa
+      central: as decisões estão separadas do que é só ciência — pedimos decisão apenas onde
+      ela é de vocês.}}
+    </p>
+    <div class="hero-meta">
+      <span class="tag hot">{{N}} decisões para vocês</span>
+      <span class="tag">{{N}} comunicados (sem decisão)</span>
+      <span class="tag">{{N}} em estudo</span>
+      <span class="tag">{{prazo crítico, se houver}}</span>
+    </div>
+    <div class="howto">
+      <h3>Como usar este documento</h3>
+      <p>Só as seções <strong>Pacotes</strong>, <strong>Execução imediata</strong> e
+      <strong>Aguardando decisão</strong> pedem resposta: <strong>Pode executar</strong>,
+      <strong>Precisa ajustar</strong> ou <strong>Não fazer</strong>. Ao escolher "ajustar" ou
+      "não", abre um campo para registrar o motivo.</p>
+      <p>A seção <strong>Comunicados</strong> é ciência, não decisão: são consertos e obrigações
+      que vamos executar e reportar. A seção <strong>Em estudo</strong> são ideias em lapidação —
+      ainda não são requisitos.</p>
+      <p>As respostas ficam salvas neste navegador. Ao final, <strong>Gerar resumo das
+      decisões</strong> monta o texto pronto para colar no grupo ou responder por e-mail.</p>
+    </div>
+  </header>
+
+  <!-- ============ 01 PANORAMA ============ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">01 · PANORAMA</div>
+      <h2>O que saiu de {{FONTES}}</h2>
+      <p class="sec-sub">{{Resumo das fontes processadas + ponteiro de rastreabilidade:
+      REGISTRO.md e triagem/auditoria de origem.}}</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-n acc">{{N}}</div><div class="stat-l">Decisões de vocês: {{X}} itens individuais + {{Y}} pacotes.</div></div>
+      <div class="stat"><div class="stat-n g">{{N}}</div><div class="stat-l">Comunicados: consertos e obrigações que executamos e reportamos.</div></div>
+      <div class="stat"><div class="stat-n a">{{N}}</div><div class="stat-l">Bloqueios: respostas ou insumos de terceiros no caminho crítico.</div></div>
+      <div class="stat"><div class="stat-n b">{{N}}</div><div class="stat-l">Em estudo: ideias em lapidação, ainda sem decisão a tomar.</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 02 BLOQUEIOS ============ -->
+  <!-- Remover a seção se não houver BLOQUEIO. -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">02 · BLOQUEIOS</div>
+      <h2>O que preciso de vocês para destravar</h2>
+      <p class="sec-sub">Estes pontos param trabalho que já está aprovado. Não é decisão de
+      escopo, é insumo ou resposta de terceiro.</p>
+    </div>
+    <div class="ask">
+      <h3>{{N}} pendências no caminho crítico</h3>
+      <p>Ordenadas pelo impacto no prazo.</p>
+      <div class="ask-list">
+        <!-- 1 .ask-item por BLOQUEIO -->
+        <div class="ask-item">
+          <div class="ask-n">1</div>
+          <div>
+            <h4>{{Título do insumo/resposta}}</h4>
+            <p>{{O que é, por que trava, o que destrava.}}</p>
+            <div class="who">{{Dono}} · {{prazo/estado}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 03 COMUNICADOS ============ -->
+  <!-- SEM botões de decisão. Disposição COMUNICADO: bugs, obrigações, entendimento do plano. -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">03 · COMUNICADOS</div>
+      <h2>O que vamos fazer sem pedir aprovação</h2>
+      <p class="sec-sub">Consertos de comportamento esperado e obrigações. <strong>Não há decisão
+      a tomar aqui</strong> — registramos para que vocês saibam o que está sendo feito e por quê.
+      Se algo parecer errado, comente no retorno.</p>
+    </div>
+    <div class="items">
+      <!-- 1 .item por COMUNICADO — sem .decide -->
+      <article class="item" data-id="{{ID}}" data-decide="none">
+        <div class="item-top">
+          <span class="item-id mute">{{ID}}</span>
+          <span class="item-title">{{Título — ex.: Corrigir o botão "Nova PoV" que não abre}}</span>
+        </div>
+        <div class="item-body">
+          {{O que está quebrado/obrigatório, causa se conhecida, o que faremos.}}
+        </div>
+        <div class="meta-row">
+          <span class="chip bug">{{Bug em produção / Obrigação}}</span>
+          <span class="chip">Esforço: {{baixo}}</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ 04 PACOTES ============ -->
+  <!-- 1 card por PKG-*; decisão ÚNICA por pacote; itens absorvidos em checklist. -->
+  <section data-decide-group="PACOTES">
+    <div class="sec-head">
+      <div class="sec-num">04 · PACOTES</div>
+      <h2>Ajustes finos agrupados — uma decisão por pacote</h2>
+      <p class="sec-sub">Itens pequenos demais para pedir uma decisão cada. Agrupados por tema:
+      aprovar o pacote aprova todos os itens dele. Para tirar um item específico, use
+      "precisa ajustar" e diga qual.</p>
+    </div>
+    <div class="items">
+      <article class="item" data-id="{{PKG-tema-01}}">
+        <div class="item-top">
+          <span class="item-id">{{PKG-tema-01}}</span>
+          <span class="item-title">{{Título do pacote — ex.: Polimento visual ({{N}} itens)}}</span>
+        </div>
+        <div class="item-body">
+          {{1-2 frases: o que o pacote cobre e o que NÃO muda (nenhuma regra de negócio).}}
+          <ul class="pkg-list">
+            <li>{{Item absorvido 1}} <code>{{ID}}</code></li>
+            <li>{{Item absorvido 2}} <code>{{ID}}</code></li>
+          </ul>
+        </div>
+        <div class="meta-row">
+          <span class="chip">Esforço total: {{baixo}}</span>
+          <span class="chip good">Sem mudança de comportamento</span>
+        </div>
+        <div class="decide">
+          <button class="btn" data-v="ok" aria-pressed="false">Pode executar</button>
+          <button class="btn" data-v="adj" aria-pressed="false">Precisa ajustar</button>
+          <button class="btn" data-v="no" aria-pressed="false">Não fazer</button>
+          <textarea class="note" placeholder="Qual item tirar ou o que mudar?"></textarea>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ 05 EXECUÇÃO IMEDIATA ============ -->
+  <!-- Itens VALIDAR prontos (sem dependência aberta). Card completo obrigatório. -->
+  <section data-decide-group="EXECUCAO IMEDIATA">
+    <div class="sec-head">
+      <div class="sec-num">05 · EXECUÇÃO IMEDIATA</div>
+      <h2>{{N}} itens que posso construir agora</h2>
+      <p class="sec-sub">Decididos em {{fonte}}. Estou pedindo confirmação, não reabrindo a
+      discussão. Se algo estiver diferente do que vocês entenderam, marque "precisa ajustar".</p>
+    </div>
+    <div class="items">
+      <!-- Card VALIDAR canônico: citação verbatim (DITO) OU base da inferência (INFERIDO) -->
+      <article class="item" data-id="{{ID}}">
+        <div class="item-top">
+          <span class="item-id">{{ID}}</span>
+          <span class="item-title">{{Título imperativo}}</span>
+        </div>
+        <div class="item-body">
+          {{Explicação profunda: o que é, por que, o que muda no sistema/processo.}}
+          <div class="quote">
+            "{{trecho exato da fala}}"
+            <span>{{Falante}}, {{HH:MM:SS}} — {{fonte, data}}</span>
+          </div>
+          <!-- Se INFERIDO, usar no lugar da .quote:
+          <div class="inference">
+            {{Base da inferência: o que nos levou a essa leitura.}}
+            <span>Item deduzido pela equipe — não é pedido literal de vocês</span>
+          </div>
+          -->
+        </div>
+        <div class="meta-row">
+          <span class="chip">Esforço: {{baixo/médio/alto}}</span>
+          <span class="chip warn">{{Risco/prazo, se houver}}</span>
+          <span class="chip info">{{Dependência/absorções, se houver}}</span>
+        </div>
+        <div class="decide">
+          <button class="btn" data-v="ok" aria-pressed="false">Pode executar</button>
+          <button class="btn" data-v="adj" aria-pressed="false">Precisa ajustar</button>
+          <button class="btn" data-v="no" aria-pressed="false">Não fazer</button>
+          <textarea class="note" placeholder="O que precisa mudar?"></textarea>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ 06 AGUARDANDO DECISÃO ============ -->
+  <!-- Itens VALIDAR travados por bloqueio/terceiro. Rótulos de botão adaptados. -->
+  <section data-decide-group="AGUARDANDO DECISAO">
+    <div class="sec-head">
+      <div class="sec-num">06 · AGUARDANDO DECISÃO</div>
+      <h2>{{N}} itens que não vou tocar ainda</h2>
+      <p class="sec-sub">Cada um tem alguém no caminho crítico. Construir antes da resposta
+      significa refazer depois. Confirmem que é para esperar, ou apontem outro caminho.</p>
+    </div>
+    <div class="items">
+      <article class="item" data-id="{{ID}}">
+        <div class="item-top">
+          <span class="item-id mute">{{ID}}</span>
+          <span class="item-title">{{Título}}</span>
+        </div>
+        <div class="item-body">
+          {{O que é + o que trava (referenciar o bloqueio da seção 02).}}
+        </div>
+        <div class="meta-row">
+          <span class="chip warn">Decide: {{quem}}</span>
+          <span class="chip">{{Impacto no prazo}}</span>
+        </div>
+        <div class="decide">
+          <button class="btn" data-v="ok" aria-pressed="false">Confirmo: aguardar</button>
+          <button class="btn" data-v="adj" aria-pressed="false">Seguir outro caminho</button>
+          <button class="btn" data-v="no" aria-pressed="false">Tirar do escopo</button>
+          <textarea class="note" placeholder="Qual caminho seguir?"></textarea>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ 07 EM ESTUDO ============ -->
+  <!-- Propostas (disposição PROPOSTA). Tabela SEM botões de execução. -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">07 · EM ESTUDO</div>
+      <h2>{{N}} ideias que ainda não são requisito</h2>
+      <p class="sec-sub">Levantadas para resolver problemas reais, mas sem decisão fechada.
+      Registradas para não se perderem — <strong>não entram em construção como estão</strong>.
+      Quando alguma amadurecer, volta a vocês como proposta formal.</p>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Ideia</th><th>De onde veio</th><th>Situação</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>{{Título da proposta}}</strong><br>{{1 linha de descrição}}</td>
+            <td>{{Quem levantou (ou "sugestão nossa")}}</td>
+            <td>{{EM_DESENHO com quem / o que falta para virar proposta formal}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 08 SEQUÊNCIA ============ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">08 · SEQUÊNCIA PROPOSTA</div>
+      <h2>Em que ordem pretendo executar</h2>
+      <p class="sec-sub">A ordem não é por tamanho, é por dependência: primeiro o que destrava,
+      depois o que tem prazo, por último o que pode esperar sem custo.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div>
+          <h4>{{Etapa}}</h4>
+          <p>{{Por que primeiro / o que destrava.}}</p>
+          <div class="when">{{Quando}}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 09 RISCOS ============ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">09 · RISCOS</div>
+      <h2>O que pode dar errado</h2>
+      <p class="sec-sub">Com a forma de tratamento acordada.</p>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Risco</th><th>Impacto</th><th>Como está tratado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>{{Risco}}</strong></td><td>{{Alto/Médio}}</td><td>{{Tratamento}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 10 FECHAMENTO ============ -->
+  <section style="border-bottom:none">
+    <div class="sec-head">
+      <div class="sec-num">10 · FECHAMENTO</div>
+      <h2>Registrar as decisões</h2>
+      <p class="sec-sub">Depois de percorrer os itens, gere o resumo e me devolva. Com ele eu
+      atualizo o registro de requisitos, gero a ata e começo a executar o que for aprovado.</p>
+    </div>
+    <div class="export">
+      <button class="btn-primary" id="btn-export">Gerar resumo das decisões</button>
+      <button class="btn-ghost" id="btn-copy">Copiar</button>
+      <button class="btn-ghost" id="btn-reset">Limpar tudo</button>
+      <span class="export-msg" id="msg"></span>
+      <textarea id="resumo" readonly aria-label="Resumo das decisões"></textarea>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-brand">{{PROJETO / programa / realização}}</div>
+    <p class="foot-txt">Documento de validação gerado em {{DATA}}, a partir de {{fontes}}.</p>
+    <p class="foot-txt">Registro completo em docs/requisitos/REGISTRO.md{{ + triagem/auditoria}}.</p>
+    <p class="foot-txt">Ref: {{VALID-YYYY-MM-DD-slug}}</p>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // REF identifica a rodada de validação. DEVE ser igual ao nome do arquivo sem extensão,
+  // prefixado com VALID- (ex.: VALID-2026-07-18-dbia). É a chave do localStorage e a
+  // primeira linha do resumo — o /fm-validation-process casa o retorno por ela.
+  var REF = '{{VALID-YYYY-MM-DD-slug}}';
+  var PROJETO = '{{PROJETO}}';
+  var KEY = REF;
+  var LABEL = { ok: 'APROVADO', adj: 'AJUSTAR', no: 'NAO FAZER' };
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function save(data) {
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+  }
+
+  var state = load();
+  // Só itens com bloco de decisão contam (Comunicados e Em Estudo ficam de fora).
+  var items = Array.prototype.slice.call(document.querySelectorAll('.item'))
+    .filter(function (it) { return it.querySelector('.decide'); });
+
+  function paint(item, value, note) {
+    item.dataset.state = value || '';
+    item.querySelectorAll('.btn').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.v === value));
+    });
+    var ta = item.querySelector('.note');
+    if (ta && typeof note === 'string') ta.value = note;
+  }
+
+  function count() {
+    var c = { ok: 0, adj: 0, no: 0 };
+    items.forEach(function (it) {
+      var s = state[it.dataset.id];
+      if (s && s.v && c.hasOwnProperty(s.v)) c[s.v]++;
+    });
+    document.getElementById('c-ok').textContent = c.ok;
+    document.getElementById('c-adj').textContent = c.adj;
+    document.getElementById('c-no').textContent = c.no;
+    document.getElementById('c-total').textContent = c.ok + c.adj + c.no;
+  }
+
+  items.forEach(function (item) {
+    var id = item.dataset.id;
+    var saved = state[id];
+    if (saved) paint(item, saved.v, saved.note);
+
+    item.querySelectorAll('.btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var v = btn.dataset.v;
+        var cur = state[id] && state[id].v;
+        var next = cur === v ? '' : v;
+        state[id] = { v: next, note: (state[id] && state[id].note) || '' };
+        paint(item, next);
+        save(state);
+        count();
+      });
+    });
+
+    var ta = item.querySelector('.note');
+    if (ta) {
+      ta.addEventListener('input', function () {
+        state[id] = { v: (state[id] && state[id].v) || '', note: ta.value };
+        save(state);
+      });
+    }
+  });
+
+  count();
+
+  function buildSummary() {
+    var lines = [];
+    lines.push('REF: ' + REF);
+    lines.push(PROJETO.toUpperCase() + ' - VALIDACAO DE REQUISITOS');
+    lines.push('');
+
+    // Agrupa pelos containers de decisão (data-decide-group nas <section>).
+    document.querySelectorAll('section[data-decide-group]').forEach(function (sec) {
+      var group = sec.dataset.decideGroup;
+      var secItems = Array.prototype.slice.call(sec.querySelectorAll('.item'))
+        .filter(function (it) { return it.querySelector('.decide'); });
+      if (!secItems.length) return;
+      lines.push('== ' + group + ' ==');
+      secItems.forEach(function (item) {
+        var id = item.dataset.id;
+        var title = item.querySelector('.item-title').textContent.trim();
+        var s = state[id] || {};
+        var status = s.v ? LABEL[s.v] : 'SEM RESPOSTA';
+        lines.push('[' + status + '] ' + id + ' - ' + title);
+        if (s.note && s.note.trim()) lines.push('    obs: ' + s.note.trim());
+      });
+      lines.push('');
+    });
+
+    lines.push('== COMUNICADOS (ciencia, sem decisao) ==');
+    document.querySelectorAll('.item[data-decide="none"]').forEach(function (item) {
+      lines.push('[CIENTE] ' + item.dataset.id + ' - ' +
+        item.querySelector('.item-title').textContent.trim());
+    });
+    lines.push('');
+    lines.push('{{Prazos críticos / lembrete final, se houver}}');
+
+    return lines.join('\n');
+  }
+
+  var box = document.getElementById('resumo');
+  var msg = document.getElementById('msg');
+
+  function flash(text) {
+    msg.textContent = text;
+    setTimeout(function () { msg.textContent = ''; }, 2600);
+  }
+
+  document.getElementById('btn-export').addEventListener('click', function () {
+    box.value = buildSummary();
+    box.style.display = 'block';
+    box.scrollIntoView({ block: 'nearest' });
+  });
+
+  document.getElementById('btn-copy').addEventListener('click', function () {
+    if (!box.value) box.value = buildSummary();
+    box.style.display = 'block';
+    box.select();
+    var done = false;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(box.value).then(function () { flash('Copiado.'); });
+      done = true;
+    }
+    if (!done) {
+      try { document.execCommand('copy'); flash('Copiado.'); }
+      catch (e) { flash('Selecione o texto e copie.'); }
+    }
+  });
+
+  document.getElementById('btn-reset').addEventListener('click', function () {
+    if (!confirm('Limpar todas as respostas registradas?')) return;
+    state = {};
+    save(state);
+    items.forEach(function (it) { paint(it, '', ''); });
+    box.value = '';
+    box.style.display = 'none';
+    count();
+    flash('Respostas limpas.');
+  });
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,55 @@
+{
+  "description": "Guardas, telemetria e ingest de sessão do Flow OS (gerado por scripts/gerar-plugin-unico.js a partir do settings.json vivo e do harness-plugin)",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "command": "command -v rtk >/dev/null 2>&1 && rtk hook claude || exit 0"
+          },
+          {
+            "type": "command",
+            "timeout": 3,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/guard-dangerous-commands.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/guard-secrets-in-write.js\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/guard-pt-br-accents.js\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/exportar-flowos-lib.js\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

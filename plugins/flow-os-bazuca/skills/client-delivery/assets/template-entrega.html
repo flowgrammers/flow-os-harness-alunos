@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE DE REFERÊNCIA — Documento de Entrega (client-delivery skill)
+
+  COMO USAR (agente):
+  1. Copie este arquivo e substitua todos os {{PLACEHOLDERS}} e os cards de exemplo.
+  2. MARCA: preencha a ZONA DE MARCA do :root com a identidade do PROJETO
+     (cliente externo = brief do cliente; NUNCA a marca da casa por padrão).
+  3. Cada item entregue tem OBRIGATORIAMENTE os 4 blocos: O pedido (com citação) →
+     O que foi construído → Como foi testado (com o que NÃO foi testado por máquina) →
+     Auditar (link de produção OU evidência embutida via <details>).
+  4. Item sem evidência de teste NÃO entra no doc — volte e teste primeiro.
+  5. A constante REF do script DEVE bater com o nome do arquivo (ENTREGA-{YYYY-MM-DD}-{slug}).
+  6. Todo texto visível em pt-BR com acentuação correta.
+  7. Salvar como: {projeto}/docs/requisitos/validacao/ENTREGA-{YYYY-MM-DD}.html
+-->
+<html lang="pt-BR"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{PROJETO}} — Entrega {{MODULO}} | {{DATA_LEGIVEL}}</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    /* ================= ZONA DE MARCA (preencher pelo brief do projeto) ================= */
+    --bg: #0a1628;
+    --card: rgba(255,255,255,0.045);
+    --card-hover: rgba(255,255,255,0.07);
+    --line: rgba(255,255,255,0.09);
+    --accent: #E8E44D;
+    --accent-contrast: #0a1628;
+    --accent-soft: rgba(232,228,77,0.13);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.62);
+    --dim: rgba(255,255,255,0.38);
+    /* Superfícies internas (blocos, citações, campos). Tema claro: usar tons claros
+       (ex.: #F7F2F6, #EFE8EE) — os defaults abaixo são para tema escuro. */
+    --surface-2: rgba(0,0,0,0.22);
+    --surface-3: rgba(0,0,0,0.3);
+    --surface-code: rgba(0,0,0,0.4);
+    --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+    /* =================================================================================== */
+
+    --green: #4ade80;  --green-bg: rgba(74,222,128,0.13);
+    --red:   #f87171;  --red-bg:   rgba(248,113,113,0.13);
+    --blue:  #60a5fa;  --blue-bg:  rgba(96,165,250,0.13);
+    --r: 14px; --r-sm: 9px;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-ui); background: var(--bg); color: var(--text);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  .statusbar { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 93%, transparent);
+    backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  .statusbar-inner { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center;
+    justify-content: space-between; padding: 11px 16px; max-width: 1080px; margin: 0 auto; }
+  .sb-brand { font-weight: 800; font-size: 0.82rem; }
+  .sb-counts { display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.72rem; font-weight: 600; }
+  .sb-pill { padding: 3px 9px; border-radius: 100px; border: 1px solid var(--line); color: var(--muted); }
+  .sb-pill strong { color: var(--text); }
+  .sb-pill.ok { background: var(--green-bg); border-color: rgba(74,222,128,0.3); color: var(--green); }
+  .sb-pill.no { background: var(--red-bg); border-color: rgba(248,113,113,0.3); color: var(--red); }
+
+  .hero { padding: 44px 0 34px; border-bottom: 1px solid var(--line); }
+  .kicker { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px; }
+  h1 { font-size: clamp(1.65rem, 5.5vw, 2.7rem); font-weight: 800; line-height: 1.15;
+    letter-spacing: -0.02em; margin-bottom: 16px; }
+  .lead { font-size: clamp(0.95rem, 2.6vw, 1.08rem); color: var(--muted); max-width: 62ch; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .tag { font-size: 0.73rem; font-weight: 600; padding: 5px 11px; border-radius: 100px;
+    border: 1px solid var(--line); color: var(--muted); }
+  .tag.hot { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .howto { margin: 26px 0 0; background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--r); padding: 18px; }
+  .howto h3 { font-size: 0.83rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); margin-bottom: 10px; }
+  .howto p { font-size: 0.9rem; color: var(--muted); }
+  .howto p + p { margin-top: 8px; }
+  .howto strong { color: var(--text); }
+
+  section { padding: 44px 0; border-bottom: 1px solid var(--line); }
+  .sec-head { margin-bottom: 26px; }
+  .sec-num { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 7px; }
+  h2 { font-size: clamp(1.25rem, 4vw, 1.75rem); font-weight: 800; letter-spacing: -0.015em;
+    line-height: 1.2; margin-bottom: 10px; }
+  .sec-sub { font-size: 0.94rem; color: var(--muted); max-width: 66ch; }
+  .sec-sub strong { color: var(--text); }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 17px 18px; }
+  .stat-n { font-size: 2rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+  .stat-n.g { color: var(--green); } .stat-n.b { color: var(--blue); } .stat-n.acc { color: var(--accent); }
+  .stat-l { font-size: 0.8rem; color: var(--muted); margin-top: 7px; }
+
+  /* ---------- card de item entregue (4 blocos) ---------- */
+  /* minmax(0,1fr): sem isso, a coluna do grid dimensiona por min-content do card
+     e estoura o viewport em 320px (overflow horizontal) */
+  .items { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .item { background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 17px 16px; transition: border-color .18s ease; }
+  .item:hover { background: var(--card-hover); }
+  .item[data-state="ok"] { border-color: rgba(74,222,128,0.45); }
+  .item[data-state="no"] { border-color: rgba(248,113,113,0.5); }
+  .item-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-bottom: 11px; }
+  .item-id { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.05em; color: var(--accent-contrast);
+    background: var(--accent); padding: 3px 8px; border-radius: 5px; }
+  .item-title { font-size: 1rem; font-weight: 700; line-height: 1.35; flex: 1 1 220px; }
+
+  .block { margin-top: 10px; padding: 11px 13px; background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: var(--r-sm); }
+  .block-label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--dim); margin-bottom: 5px; }
+  .block p { font-size: 0.87rem; color: var(--muted); }
+  .block strong { color: var(--text); }
+  .quote { margin-top: 8px; padding: 8px 12px; background: var(--surface-2);
+    border-left: 2px solid var(--accent); border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    font-size: 0.82rem; color: var(--muted); font-style: italic; }
+  .quote span { display: block; font-style: normal; font-size: 0.73rem; color: var(--dim); margin-top: 4px; }
+
+  .test-list { list-style: none; margin-top: 6px; }
+  .test-list li { font-size: 0.84rem; color: var(--muted); padding: 3px 0;
+    display: flex; gap: 8px; align-items: baseline; }
+  .test-list li::before { content: "✓"; color: var(--green); font-weight: 700; }
+  .test-list li.not::before { content: "○"; color: var(--dim); }
+  .test-list li.not { color: var(--dim); }
+
+  .audit-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
+  .audit-link { display: inline-flex; align-items: center; gap: 7px; font-size: 0.8rem;
+    font-weight: 700; padding: 10px 16px; min-height: 44px; background: var(--accent);
+    color: var(--accent-contrast); border-radius: 100px; text-decoration: none;
+    transition: transform .15s ease; }
+  .audit-link:hover { transform: translateY(-1px); }
+  .audit-link.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+  .audit-link.ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.28); }
+  details.evidence { margin-top: 9px; }
+  details.evidence summary { cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--accent);
+    min-height: 44px; display: flex; align-items: center; }
+  details.evidence img { max-width: 100%; border: 1px solid var(--line); border-radius: var(--r-sm); margin-top: 8px; }
+  details.evidence pre { background: var(--surface-code); border: 1px solid var(--line);
+    border-radius: var(--r-sm); padding: 12px; margin-top: 8px; font-size: 0.74rem;
+    color: var(--muted); overflow-x: auto; }
+
+  .decide { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; padding-top: 13px;
+    border-top: 1px solid var(--line); }
+  .btn { font-family: inherit; font-size: 0.78rem; font-weight: 700; padding: 11px 16px;
+    min-height: 44px; border-radius: 100px; border: 1px solid var(--line); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all .16s ease; }
+  .btn:hover { border-color: rgba(255,255,255,0.28); color: var(--text); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn[aria-pressed="true"][data-v="ok"] { background: var(--green); border-color: var(--green); color: #06280f; }
+  .btn[aria-pressed="true"][data-v="no"] { background: var(--red); border-color: var(--red); color: #2e0707; }
+  .note { width: 100%; margin-top: 9px; font-family: inherit; font-size: 0.84rem;
+    background: var(--surface-3); color: var(--text); border: 1px solid var(--line);
+    border-radius: var(--r-sm); padding: 9px 11px; resize: vertical; min-height: 42px; display: none; }
+  .note::placeholder { color: var(--dim); }
+  .note:focus { outline: none; border-color: var(--accent); }
+  .item[data-state="no"] .note { display: block; }
+
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--line); border-radius: var(--r); }
+  table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  th, td { padding: 11px 13px; text-align: left; font-size: 0.84rem; border-bottom: 1px solid var(--line); }
+  th { background: rgba(255,255,255,0.045); font-weight: 700; font-size: 0.76rem;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  td { color: var(--muted); }
+  td strong { color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+
+  .export { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--card);
+    border: 1px solid var(--line); border-radius: var(--r); padding: 18px; }
+  .btn-primary { font-family: inherit; font-size: 0.85rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.04em; padding: 13px 22px; min-height: 46px; background: var(--accent);
+    color: var(--accent-contrast); border: none; border-radius: 100px; cursor: pointer;
+    transition: transform .16s ease; }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-ghost { font-family: inherit; font-size: 0.8rem; font-weight: 600; padding: 12px 18px;
+    min-height: 46px; background: transparent; color: var(--muted); border: 1px solid var(--line);
+    border-radius: 100px; cursor: pointer; }
+  .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.28); }
+  .export-msg { font-size: 0.82rem; color: var(--green); font-weight: 600; }
+  #resumo { display: none; width: 100%; margin-top: 14px;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.78rem;
+    background: var(--surface-code); color: var(--text); border: 1px solid var(--line);
+    border-radius: var(--r-sm); padding: 14px; min-height: 220px; line-height: 1.55; }
+
+  footer { padding: 34px 0 46px; }
+  .foot-brand { font-weight: 800; font-size: 0.95rem; margin-bottom: 6px; }
+  .foot-txt { font-size: 0.8rem; color: var(--dim); }
+  .foot-txt + .foot-txt { margin-top: 4px; }
+
+  @media (min-width: 768px) {
+    .wrap { padding: 0 32px; }
+    .statusbar-inner { padding: 13px 32px; }
+    .hero { padding: 64px 0 46px; }
+    section { padding: 60px 0; }
+    .stats { grid-template-columns: repeat(4, 1fr); }
+    .howto { padding: 24px; }
+    .item { padding: 20px 22px; }
+  }
+  @media print {
+    .statusbar, .decide, .export { display: none !important; }
+    body { background: #fff; color: #111; }
+    .item, .stat, .block, .howto { border-color: #ccc; background: #fff; }
+    .block p, .sec-sub, .lead, td { color: #333; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="statusbar">
+  <div class="statusbar-inner">
+    <div class="sb-brand">{{PROJETO}} · Entrega {{MODULO}}</div>
+    <div class="sb-counts">
+      <span class="sb-pill">Auditados <strong id="c-total">0</strong>/{{TOTAL_ITENS}}</span>
+      <span class="sb-pill ok">Aceitos <strong id="c-ok">0</strong></span>
+      <span class="sb-pill no">Problemas <strong id="c-no">0</strong></span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="kicker">Documento de entrega · {{DATA_LEGIVEL}}</div>
+    <h1>{{TITULO — ex.: Entrega do módulo X}}</h1>
+    <p class="lead">
+      {{RESUMO: o que este módulo cobriu, de onde vieram os pedidos (validação REF, reuniões),
+      e a promessa: cada item abaixo mostra o pedido original, o que foi construído, como foi
+      testado e onde auditar.}}
+    </p>
+    <div class="hero-meta">
+      <span class="tag hot">{{N}} itens entregues</span>
+      <span class="tag">{{N}} testes automatizados verdes</span>
+      <span class="tag">Validação de origem: {{VALID-ref, se houver}}</span>
+    </div>
+    <div class="howto">
+      <h3>Como auditar esta entrega</h3>
+      <p>Cada item mostra <strong>o pedido</strong>, <strong>o que foi construído</strong>,
+      <strong>como foi testado</strong> e o botão <strong>Auditar</strong> — que abre a tela
+      real para você conferir com seus próprios olhos.</p>
+      <p>Depois de conferir, marque <strong>Confirmo entregue</strong> ou
+      <strong>Encontrei problema</strong> (abre campo para descrever). Ao final, gere o resumo
+      e me devolva — com ele eu fecho os itens aceitos e reabro o que tiver problema.</p>
+    </div>
+  </header>
+
+  <!-- ============ 01 PANORAMA ============ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">01 · PANORAMA</div>
+      <h2>O que esta entrega cobre</h2>
+      <p class="sec-sub">{{Contexto do módulo/wave + ponteiros: REGISTRO.md, docs/testes/, validação de origem.}}</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-n acc">{{N}}</div><div class="stat-l">Itens entregues neste módulo.</div></div>
+      <div class="stat"><div class="stat-n g">{{N}}</div><div class="stat-l">Testes automatizados executados e verdes.</div></div>
+      <div class="stat"><div class="stat-n b">{{N}}</div><div class="stat-l">Fluxos validados manualmente com roteiro.</div></div>
+      <div class="stat"><div class="stat-n acc">{{N}}</div><div class="stat-l">Links diretos para auditar em produção.</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 02 ITENS ENTREGUES ============ -->
+  <section data-decide-group="ITENS ENTREGUES">
+    <div class="sec-head">
+      <div class="sec-num">02 · ITENS ENTREGUES</div>
+      <h2>Confira item a item</h2>
+      <p class="sec-sub">Pedido → construído → testado → <strong>auditar</strong>. Nenhum item
+      entrou aqui sem evidência de teste.</p>
+    </div>
+    <div class="items">
+
+      <!-- Card canônico de item entregue: 4 blocos obrigatórios -->
+      <article class="item" data-id="{{ID}}">
+        <div class="item-top">
+          <span class="item-id">{{ID}}</span>
+          <span class="item-title">{{Título do item}}</span>
+        </div>
+
+        <div class="block">
+          <div class="block-label">O pedido</div>
+          <p>{{Breve descrição da reclamação/pedido original.}}</p>
+          <div class="quote">
+            "{{citação verbatim da fonte}}"
+            <span>{{Falante}}, {{fonte + data/timestamp}}</span>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="block-label">O que foi construído</div>
+          <p>{{Breve descrição da funcionalidade montada — o que existe agora que não existia.}}</p>
+        </div>
+
+        <div class="block">
+          <div class="block-label">Como foi testado</div>
+          <ul class="test-list">
+            <li>{{Teste de máquina com resultado real — ex.: 12 testes unitários do fluxo, todos verdes}}</li>
+            <li>{{Teste E2E/integração — ex.: fluxo completo executado em produção em DD/MM}}</li>
+            <li class="not">{{O que NÃO foi testado por máquina — validar na auditoria humana}}</li>
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="block-label">Auditar</div>
+          <p>{{1 frase: o que conferir e o que esperar ver.}}</p>
+          <div class="audit-row">
+            <a class="audit-link" href="{{URL de produção da tela/fluxo}}" target="_blank" rel="noopener">Abrir e conferir →</a>
+            <!-- Link secundário opcional: <a class="audit-link ghost" href="{{...}}">Ver relatório de testes</a> -->
+          </div>
+          <!-- Quando NÃO há tela (script/migration/backend), usar evidência embutida no lugar do link:
+          <details class="evidence">
+            <summary>Ver evidência do teste (screenshot/output)</summary>
+            <img src="data:image/png;base64,{{...}}" alt="{{descrição da evidência}}">
+            <pre>{{output real do teste}}</pre>
+          </details>
+          -->
+        </div>
+
+        <div class="decide">
+          <button class="btn" data-v="ok" aria-pressed="false">Confirmo entregue</button>
+          <button class="btn" data-v="no" aria-pressed="false">Encontrei problema</button>
+          <textarea class="note" placeholder="O que você encontrou? (tela, passo, o que esperava vs o que viu)"></textarea>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ 03 FORA DESTA ENTREGA ============ -->
+  <!-- Honestidade sobre o corte. Remover se não houver itens de fora. -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">03 · FORA DESTA ENTREGA</div>
+      <h2>O que ficou de fora e por quê</h2>
+      <p class="sec-sub">Para não parecer esquecimento: estes itens não entraram neste módulo,
+      com o motivo e o destino de cada um.</p>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Item</th><th>Por que ficou de fora</th><th>Destino</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>{{ID/título}}</strong></td>
+            <td>{{motivo — ex.: depende do bloqueio X / aprovado para a próxima wave}}</td>
+            <td>{{próxima wave / aguardando insumo / em estudo}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 04 FECHAMENTO ============ -->
+  <section style="border-bottom:none">
+    <div class="sec-head">
+      <div class="sec-num">04 · FECHAMENTO</div>
+      <h2>Registrar o aceite</h2>
+      <p class="sec-sub">Depois de auditar os itens, gere o resumo e me devolva. Itens aceitos
+      são fechados; itens com problema voltam para execução com a sua observação.</p>
+    </div>
+    <div class="export">
+      <button class="btn-primary" id="btn-export">Gerar resumo do aceite</button>
+      <button class="btn-ghost" id="btn-copy">Copiar</button>
+      <button class="btn-ghost" id="btn-reset">Limpar tudo</button>
+      <span class="export-msg" id="msg"></span>
+      <textarea id="resumo" readonly aria-label="Resumo do aceite"></textarea>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-brand">{{PROJETO / programa / realização}}</div>
+    <p class="foot-txt">Documento de entrega gerado em {{DATA}}, módulo {{MODULO}}.</p>
+    <p class="foot-txt">Evidências completas em docs/testes/ · Registro em docs/requisitos/REGISTRO.md</p>
+    <p class="foot-txt">Ref: {{ENTREGA-YYYY-MM-DD-slug}}</p>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // REF identifica a rodada de entrega. DEVE ser igual ao nome do arquivo sem extensão,
+  // no formato ENTREGA-YYYY-MM-DD-slug. É a chave do localStorage e a primeira linha do
+  // resumo — o /fm-delivery-process casa o retorno por ela.
+  var REF = '{{ENTREGA-YYYY-MM-DD-slug}}';
+  var PROJETO = '{{PROJETO}}';
+  var KEY = REF;
+  var LABEL = { ok: 'ACEITO', no: 'PROBLEMA' };
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function save(data) {
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+  }
+
+  var state = load();
+  var items = Array.prototype.slice.call(document.querySelectorAll('.item'))
+    .filter(function (it) { return it.querySelector('.decide'); });
+
+  function paint(item, value, note) {
+    item.dataset.state = value || '';
+    item.querySelectorAll('.btn').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.v === value));
+    });
+    var ta = item.querySelector('.note');
+    if (ta && typeof note === 'string') ta.value = note;
+  }
+
+  function count() {
+    var c = { ok: 0, no: 0 };
+    items.forEach(function (it) {
+      var s = state[it.dataset.id];
+      if (s && s.v && c.hasOwnProperty(s.v)) c[s.v]++;
+    });
+    document.getElementById('c-ok').textContent = c.ok;
+    document.getElementById('c-no').textContent = c.no;
+    document.getElementById('c-total').textContent = c.ok + c.no;
+  }
+
+  items.forEach(function (item) {
+    var id = item.dataset.id;
+    var saved = state[id];
+    if (saved) paint(item, saved.v, saved.note);
+
+    item.querySelectorAll('.btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var v = btn.dataset.v;
+        var cur = state[id] && state[id].v;
+        var next = cur === v ? '' : v;
+        state[id] = { v: next, note: (state[id] && state[id].note) || '' };
+        paint(item, next);
+        save(state);
+        count();
+      });
+    });
+
+    var ta = item.querySelector('.note');
+    if (ta) {
+      ta.addEventListener('input', function () {
+        state[id] = { v: (state[id] && state[id].v) || '', note: ta.value };
+        save(state);
+      });
+    }
+  });
+
+  count();
+
+  function buildSummary() {
+    var lines = [];
+    lines.push('REF: ' + REF);
+    lines.push(PROJETO.toUpperCase() + ' - ACEITE DE ENTREGA');
+    lines.push('');
+    lines.push('== ITENS ENTREGUES ==');
+    items.forEach(function (item) {
+      var id = item.dataset.id;
+      var title = item.querySelector('.item-title').textContent.trim();
+      var s = state[id] || {};
+      var status = s.v ? LABEL[s.v] : 'SEM RESPOSTA';
+      lines.push('[' + status + '] ' + id + ' - ' + title);
+      if (s.note && s.note.trim()) lines.push('    obs: ' + s.note.trim());
+    });
+    lines.push('');
+    lines.push('{{Lembrete final, se houver}}');
+    return lines.join('\n');
+  }
+
+  var box = document.getElementById('resumo');
+  var msg = document.getElementById('msg');
+
+  function flash(text) {
+    msg.textContent = text;
+    setTimeout(function () { msg.textContent = ''; }, 2600);
+  }
+
+  document.getElementById('btn-export').addEventListener('click', function () {
+    box.value = buildSummary();
+    box.style.display = 'block';
+    box.scrollIntoView({ block: 'nearest' });
+  });
+
+  document.getElementById('btn-copy').addEventListener('click', function () {
+    if (!box.value) box.value = buildSummary();
+    box.style.display = 'block';
+    box.select();
+    var done = false;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(box.value).then(function () { flash('Copiado.'); });
+      done = true;
+    }
+    if (!done) {
+      try { document.execCommand('copy'); flash('Copiado.'); }
+      catch (e) { flash('Selecione o texto e copie.'); }
+    }
+  });
+
+  document.getElementById('btn-reset').addEventListener('click', function () {
+    if (!confirm('Limpar todas as respostas registradas?')) return;
+    state = {};
+    save(state);
+    items.forEach(function (it) { paint(it, '', ''); });
+    box.value = '';
+    box.style.display = 'none';
+    count();
+    flash('Respostas limpas.');
+  });
+})();
+</script>
+
+</body></html>
