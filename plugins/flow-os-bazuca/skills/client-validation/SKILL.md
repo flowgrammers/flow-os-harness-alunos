@@ -1,7 +1,7 @@
 ---
 name: client-validation
 description: >
-  Gera e processa documentos de validação de requisitos com cliente (padrão DBIA/Plataforma
+  Gera e processa documentos de validação de requisitos com cliente (padrão de dois projetos reais
   canonizado). Modo GERAR: REGISTRO.md + triagem → HTML interativo agrupado por Disposição
   (comunicados sem decisão, pacotes com decisão única, requisitos com decisão individual,
   propostas em estudo) com export textual. Modo PROCESSAR: retorno colado do cliente →

@@ -5,7 +5,7 @@ description: Registra item aprovado no REGISTRO.md com ID único e métricas atu
 
 ## O que essa skill faz
 
-Registra um item aprovado no REGISTRO.md do projeto com todos os campos obrigatorios, atribui ID unico e atualiza metricas. Replica o padrao DBIA de gestao de requisitos.
+Registra um item aprovado no REGISTRO.md do projeto com todos os campos obrigatorios, atribui ID unico e atualiza metricas. Replica o padrao de um projeto real de gestao de requisitos.
 
 ---
 
@@ -130,7 +130,7 @@ Se a pasta nao existir, criar automaticamente.
 ```
 /fm-requirement-register
 Titulo: Implementar autenticacao por email
-Projeto: DBIA
+Projeto: Atlas
 Fonte: R5 (01:23:45) — Paolo
 Tipo: Feature
 Esforco: 16h
@@ -142,9 +142,9 @@ Esforco: 16h
 
 - **ID**: R5-14
 - **Titulo**: Implementar autenticacao por email
-- **Projeto**: DBIA
+- **Projeto**: Atlas
 - **Status**: LISTADO
-- **Arquivo**: `DBIA/docs/requisitos/REGISTRO.md`
+- **Arquivo**: `atlas/docs/requisitos/REGISTRO.md`
 
 Proximo passo: Execute `/fm-triage` para triagem ou atualize status para TRIADO.
 ```

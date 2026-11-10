@@ -60,7 +60,7 @@ que a próxima sessão consegue reler sozinha. Handoff não é diário de bordo.
 Quais, depende do projeto. Se o `CLAUDE.md` do projeto declarar um bloco `handoff-docs`, use a
 lista dele. Sem o bloco, o hook `flowos-papel.js` cai num padrão herdado do projeto de origem
 (`TRACKING.md`, `docs/RETOMADA.md`) — **um palpite deste projeto, não uma convenção fleet-wide**: em
-projeto onde esses arquivos não existem (ex.: Plataforma de Letramento), a proteção não tem objeto.
+projeto onde esses arquivos não existem (ex.: um projeto que use outro documento de acompanhamento), a proteção não tem objeto.
 Declare o bloco assim que o projeto tiver documento de acompanhamento próprio; não conte com o
 fallback (medido em 2026-09-25, REQ-361/D9).
 

@@ -5,7 +5,7 @@ description: Gera o documento de validação de requisitos (HTML interativo) a p
 # /fm-validation-doc
 
 Gera o documento de validação para o cliente decidir requisitos — padrão canonizado dos casos
-DBIA (18/07/2026) e Plataforma de Letramento (20/07/2026).
+dois projetos de cliente (julho de 2026).
 
 ## Processo
 
